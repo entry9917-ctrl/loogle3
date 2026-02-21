@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Loogle</title>
+    <script async src="https://cse.google.com/cse.js?cx=76dc8eb5e87d44415"></script>
     <style>
         /* 1. 기본 설정 */
         body, html {
@@ -25,7 +26,7 @@
             animation: fadeIn 0.8s ease-out;
         }
         .loogle-text {
-            font-size: 80px; /* 로고 크기 */
+            font-size: 80px;
             font-weight: bold;
             letter-spacing: -3px;
         }
@@ -34,31 +35,39 @@
         .c-yellow { color: #FBBC05; }
         .c-green { color: #34A853; }
 
-        /* 3. 검색창 디자인 */
-        .search-container {
+        /* 3. 검색창 및 결과 영역 디자인 */
+        .search-wrapper {
             width: 90%;
             max-width: 580px;
-            position: relative;
+            text-align: center;
         }
-        #search-input {
+        
+        /* 구글 CSE 내부 디자인 커스텀 */
+        .gcse-search {
+            margin-top: 10px;
+        }
+        
+        /* 사장님의 기존 입력창 스타일을 유지하고 싶은 경우를 위해 하단에 배치 */
+        .custom-input-box {
             width: 100%;
             padding: 16px 25px;
             font-size: 16px;
             border: 1px solid #dfe1e5;
             border-radius: 30px;
             outline: none;
-            box-sizing: border-box; /* 패딩 포함 크기 계산 */
+            box-sizing: border-box;
             transition: all 0.2s ease;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
         }
-        #search-input:hover, #search-input:focus {
-            box-shadow: 0 2px 8px rgba(32,33,36,0.3); /* 구글 스타일 그림자 */
+        .custom-input-box:hover, .custom-input-box:focus {
+            box-shadow: 0 2px 8px rgba(32,33,36,0.3);
             border-color: rgba(223,225,229,0);
         }
 
-        /* 4. 하단 설명 및 버튼 */
+        /* 4. 하단 설명 */
         .info-text {
-            margin-top: 30px;
+            margin-top: 40px;
             color: #5f6368;
             font-size: 14px;
             text-align: center;
@@ -73,10 +82,9 @@
         /* 5. 모바일 대응 */
         @media (max-width: 600px) {
             .loogle-text { font-size: 50px; }
-            #search-input { padding: 14px 20px; font-size: 15px; }
+            .custom-input-box { padding: 14px 20px; font-size: 15px; }
         }
 
-        /* 애니메이션 */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
@@ -91,8 +99,10 @@
         </span>
     </div>
 
-    <div class="search-container">
-        <input type="text" id="search-input" placeholder="Loogle 검색 또는 URL 입력" autofocus>
+    <div class="search-wrapper">
+        <input type="text" id="search-input" class="custom-input-box" placeholder="Loogle 검색 또는 URL 입력" autofocus>
+        
+        <div class="gcse-searchresults-only"></div>
     </div>
 
     <div class="info-text">
@@ -103,7 +113,6 @@
     <script>
         const input = document.getElementById('search-input');
 
-        // 엔터키 감지 및 이동 실행
         input.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 performAction(input.value);
@@ -111,26 +120,20 @@
         });
 
         function performAction(query) {
-            if (!query.trim()) return; // 빈 칸이면 실행 안 함
+            if (!query.trim()) return;
 
-            let targetUrl = "";
-
-            // 1. URL인지 확인하는 간단한 로직 (http로 시작하거나, 중간에 점(.)이 있고 공백이 없으면 주소로 간주)
+            // 1. URL인지 확인 (주소창 기능)
             if (query.startsWith('http://') || query.startsWith('https://')) {
-                targetUrl = query;
+                window.location.href = query;
             } else if (query.includes('.') && !query.includes(' ')) {
-                // 예: naver.com 입력 시 -> https://naver.com 으로 이동
-                targetUrl = "https://" + query;
+                window.location.href = "https://" + query;
             } else {
-                // 2. 그 외에는 모두 구글 검색으로 이동
-                targetUrl = "https://www.google.com/search?q=" + encodeURIComponent(query);
+                // 2. 구글 맞춤 검색 엔진을 통한 검색 (사장님 전용 ID 사용)
+                // 현재 페이지에서 구글 검색 결과 페이지로 이동합니다.
+                window.location.href = "https://cse.google.com/cse?cx=76dc8eb5e87d44415&q=" + encodeURIComponent(query);
             }
-
-            // ★ 핵심: 현재 탭에서 해당 주소로 이동 (iframe 안 씀)
-            window.location.href = targetUrl;
         }
     </script>
 
 </body>
-
 </html>

@@ -5,88 +5,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Loogle</title>
     <style>
-        /* 1. 전체 레이아웃 잡기 */
         body, html {
             margin: 0; padding: 0;
             width: 100%; height: 100%;
             font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
             background: #ffffff;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center; /* 화면 정중앙 배치 */
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
+        .logo-box { margin-bottom: 40px; user-select: none; animation: fadeIn 0.8s ease-out; }
+        .loogle-text { font-size: 80px; font-weight: bold; letter-spacing: -4px; }
+        .c-blue { color: #4285F4; } .c-red { color: #EA4335; }
+        .c-yellow { color: #FBBC05; } .c-green { color: #34A853; }
 
-        /* 2. Loogle 로고 (애니메이션 포함) */
-        .logo-box {
-            margin-bottom: 40px;
-            cursor: default;
-            user-select: none;
-            animation: fadeIn 0.8s ease-out;
-        }
-        .loogle-text {
-            font-size: 80px;
-            font-weight: bold;
-            letter-spacing: -4px;
-        }
-        .c-blue { color: #4285F4; }
-        .c-red { color: #EA4335; }
-        .c-yellow { color: #FBBC05; }
-        .c-green { color: #34A853; }
-
-        /* 3. 검색창 디자인 (구글 스타일) */
-        .search-wrapper {
-            width: 90%;
-            max-width: 580px;
-            text-align: center;
-            position: relative;
-        }
-        
+        .search-wrapper { width: 90%; max-width: 580px; text-align: center; }
         .custom-input-box {
-            width: 100%;
-            padding: 18px 30px; /* 내부 여백 넉넉하게 */
-            font-size: 18px;
-            border: 1px solid #dfe1e5;
-            border-radius: 50px; /* 완전 둥글게 */
-            outline: none;
-            box-sizing: border-box;
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            width: 100%; padding: 18px 30px; font-size: 18px;
+            border: 1px solid #dfe1e5; border-radius: 50px; outline: none;
+            box-sizing: border-box; transition: all 0.3s ease;
             box-shadow: 0 1px 6px rgba(32,33,36,0.1);
         }
-
-        /* 마우스 올리거나 입력 중일 때 그림자 효과 */
         .custom-input-box:hover, .custom-input-box:focus {
-            box-shadow: 0 4px 15px rgba(32,33,36,0.2);
-            border-color: rgba(223,225,229,0);
+            box-shadow: 0 4px 15px rgba(32,33,36,0.2); border-color: rgba(223,225,229,0);
         }
 
-        /* 4. 하단 저작권 및 설명 */
-        .info-text {
-            margin-top: 60px;
-            color: #5f6368;
-            font-size: 14px;
-            text-align: center;
-            line-height: 1.6;
-            opacity: 0.8;
-        }
-        .shortcut-help {
-            font-size: 12px;
-            color: #9aa0a6;
-            margin-top: 10px;
-        }
-
-        /* 5. 모바일 화면 최적화 */
-        @media (max-width: 600px) {
-            .loogle-text { font-size: 56px; }
-            .custom-input-box { padding: 15px 25px; font-size: 16px; }
-            .logo-box { margin-bottom: 30px; }
-        }
-
-        /* 등장 애니메이션 */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        .info-text { margin-top: 60px; color: #5f6368; font-size: 14px; text-align: center; }
+        @media (max-width: 600px) { .loogle-text { font-size: 56px; } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
@@ -98,41 +42,38 @@
     </div>
 
     <div class="search-wrapper">
-        <input type="text" id="search-input" class="custom-input-box" placeholder="검색어 또는 URL 입력" autofocus autocomplete="off">
+        <form action="https://www.google.com/search" method="GET" id="search-form">
+            <input type="text" name="q" id="search-input" class="custom-input-box" placeholder="검색어 또는 URL 입력" autofocus autocomplete="off">
+        </form>
     </div>
 
     <div class="info-text">
         모두의 브라우저, Loogle. <br>
-        <div class="shortcut-help">© 2026. 엘도라도. All rights reserved.</div>
+        <div style="font-size: 12px; color: #9aa0a6; margin-top: 10px;">© 2026. 엘도라도. All rights reserved.</div>
     </div>
 
     <script>
         const input = document.getElementById('search-input');
+        const form = document.getElementById('search-form');
 
-        // 엔터키 입력 감지
         input.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
-                performAction(input.value);
+                e.preventDefault(); // 기본 폼 제출 방지 후 로직 실행
+                const query = input.value.trim();
+                
+                if (!query) return;
+
+                // 1. URL 주소인지 확인
+                if (query.startsWith('http://') || query.startsWith('https://')) {
+                    window.location.href = query;
+                } else if (query.includes('.') && !query.includes(' ')) {
+                    window.location.href = "https://" + query;
+                } else {
+                    // 2. 주소가 아니면 구글 검색 폼 제출
+                    form.submit();
+                }
             }
         });
-
-        function performAction(query) {
-            // 공백만 입력했을 땐 무시
-            if (!query.trim()) return;
-
-            // 1. URL 감지 로직 (주소창 기능)
-            // http로 시작하거나, 중간에 점(.)이 있고 공백이 없으면 주소로 판단
-            if (query.startsWith('http://') || query.startsWith('https://')) {
-                window.location.href = query;
-            } else if (query.includes('.') && !query.includes(' ')) {
-                window.location.href = "https://" + query;
-            } else {
-                // 2. 검색 로직
-                // 사장님의 맞춤 검색 엔진 결과 페이지로 이동 (가장 안정적임)
-                window.location.href = "https://cse.google.com/cse?cx=76dc8eb5e87d44415&q=" + encodeURIComponent(query);
-            }
-        }
     </script>
-
 </body>
 </html>

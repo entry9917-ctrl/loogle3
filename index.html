@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loogle</title>
+    <style>
+        /* 1. 기본 설정 */
+        body, html {
+            margin: 0; padding: 0;
+            width: 100%; height: 100%;
+            font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 2. Loogle 로고 디자인 */
+        .logo-box {
+            margin-bottom: 30px;
+            cursor: default;
+            user-select: none;
+            animation: fadeIn 0.8s ease-out;
+        }
+        .loogle-text {
+            font-size: 80px; /* 로고 크기 */
+            font-weight: bold;
+            letter-spacing: -3px;
+        }
+        .c-blue { color: #4285F4; }
+        .c-red { color: #EA4335; }
+        .c-yellow { color: #FBBC05; }
+        .c-green { color: #34A853; }
+
+        /* 3. 검색창 디자인 */
+        .search-container {
+            width: 90%;
+            max-width: 580px;
+            position: relative;
+        }
+        #search-input {
+            width: 100%;
+            padding: 16px 25px;
+            font-size: 16px;
+            border: 1px solid #dfe1e5;
+            border-radius: 30px;
+            outline: none;
+            box-sizing: border-box; /* 패딩 포함 크기 계산 */
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        #search-input:hover, #search-input:focus {
+            box-shadow: 0 2px 8px rgba(32,33,36,0.3); /* 구글 스타일 그림자 */
+            border-color: rgba(223,225,229,0);
+        }
+
+        /* 4. 하단 설명 및 버튼 */
+        .info-text {
+            margin-top: 30px;
+            color: #5f6368;
+            font-size: 14px;
+            text-align: center;
+            line-height: 1.6;
+        }
+        .shortcut-help {
+            font-size: 12px;
+            color: #9aa0a6;
+            margin-top: 10px;
+        }
+
+        /* 5. 모바일 대응 */
+        @media (max-width: 600px) {
+            .loogle-text { font-size: 50px; }
+            #search-input { padding: 14px 20px; font-size: 15px; }
+        }
+
+        /* 애니메이션 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="logo-box">
+        <span class="loogle-text">
+            <span class="c-blue">L</span><span class="c-red">o</span><span class="c-yellow">o</span><span class="c-blue">g</span><span class="c-green">l</span><span class="c-red">e</span>
+        </span>
+    </div>
+
+    <div class="search-container">
+        <input type="text" id="search-input" placeholder="Loogle 검색 또는 URL 입력" autofocus>
+    </div>
+
+    <div class="info-text">
+        모두의 브라우저, Loogle. <br>
+        <div class="shortcut-help">검색어 또는 URL 입력</div>
+    </div>
+
+    <script>
+        const input = document.getElementById('search-input');
+
+        // 엔터키 감지 및 이동 실행
+        input.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                performAction(input.value);
+            }
+        });
+
+        function performAction(query) {
+            if (!query.trim()) return; // 빈 칸이면 실행 안 함
+
+            let targetUrl = "";
+
+            // 1. URL인지 확인하는 간단한 로직 (http로 시작하거나, 중간에 점(.)이 있고 공백이 없으면 주소로 간주)
+            if (query.startsWith('http://') || query.startsWith('https://')) {
+                targetUrl = query;
+            } else if (query.includes('.') && !query.includes(' ')) {
+                // 예: naver.com 입력 시 -> https://naver.com 으로 이동
+                targetUrl = "https://" + query;
+            } else {
+                // 2. 그 외에는 모두 구글 검색으로 이동
+                targetUrl = "https://www.google.com/search?q=" + encodeURIComponent(query);
+            }
+
+            // ★ 핵심: 현재 탭에서 해당 주소로 이동 (iframe 안 씀)
+            window.location.href = targetUrl;
+        }
+    </script>
+
+</body>
+</html>
